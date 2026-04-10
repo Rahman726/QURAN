@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📖 احادیث مبارکہ - Collection of Hadith</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .hadith-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .hadith-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 25px;
+      border: 1px solid var(--ayah-border);
+      transition: all 0.3s;
+    }
+
+    .hadith-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .hadith-number {
+      background: var(--header-gradient);
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+    }
+
+    .hadith-arabic {
+      font-size: 1.4rem;
+      line-height: 2;
+      color: var(--text-primary);
+      font-family: 'Amiri', 'Noto Naskh Arabic', serif;
+      text-align: right;
+      margin: 15px 0;
+      padding: 20px;
+      background: var(--transliteration-bg);
+      border-radius: 15px;
+    }
+
+    .hadith-urdu {
+      font-size: 1.1rem;
+      line-height: 1.9;
+      color: #5a7a4a;
+      font-family: 'Jameel Noori Nastaleeq', 'Urdu Typesetting', serif;
+      text-align: right;
+      margin: 15px 0;
+      padding-right: 20px;
+      border-right: 4px solid var(--urdu-border);
+    }
+
+    .hadith-english {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin: 15px 0;
+      padding-left: 20px;
+      border-left: 4px solid var(--translation-border);
+    }
+
+    .hadith-ref {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 15px;
+      padding: 10px 15px;
+      background: var(--highlight-bg);
+      border-radius: 10px;
+      display: inline-block;
+    }
+
+    .hadith-topic {
+      background: var(--border-accent);
+      color: #1e3a2f;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      display: inline-block;
+    }
+
+    .back-btn {
+      display: inline-block;
+      background: var(--active-btn-bg);
+      color: var(--active-btn-text);
+      padding: 10px 25px;
+      border-radius: 30px;
+      text-decoration: none;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .category-title {
+      background: var(--header-gradient);
+      color: white;
+      padding: 18px 30px;
+      border-radius: 15px;
+      font-size: 1.3rem;
+      margin: 30px 0 20px 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="quran-app">
+  <div class="app-header">
+    <h1>📖 احادیث مبارکہ</h1>
+    <p>Collection of Authentic Hadith from Sahih Bukhari & Muslim</p>
+  </div>
+
+  <div class="hadith-container">
+    <a href="quran.html" class="back-btn">⬅️ واپس قرآن</a>
+
+    <!-- Hadith 1 -->
+    <div class="hadith-card">
+      <div class="hadith-topic">🕌 نماز (Prayer)</div>
+      <div class="hadith-number">1</div>
+      <div class="hadith-arabic">
+        إن بين الرجل وبين الشرك والكفر ترك الصلاة
+      </div>
+      <div class="hadith-urdu">
+        بے شک انسان اور شرک و کفر کے درمیان (فاصل) نماز کا چھوڑنا ہے۔
+      </div>
+      <div class="hadith-english">
+        "Indeed, between a man and shirk (associating partners with Allah) and kufr (disbelief) there stands his giving up prayer."
+      </div>
+      <div class="hadith-ref">📚 صحیح مسلم - Sahih Muslim</div>
+    </div>
+
+    <!-- Hadith 2 -->
+    <div class="hadith-card">
+      <div class="hadith-topic">🤲 دعا (Dua)</div>
+      <div class="hadith-number">2</div>
+      <div class="hadith-arabic">
+        الدعاء هو العبادة
+      </div>
+      <div class="hadith-urdu">
+        دعا عبادت ہے (یعنی دعا عبادت کا مغز اور خلاصہ ہے)۔
+      </div>
+      <div class="hadith-english">
+        "Supplication (dua) is itself worship."
+      </div>
+      <div class="hadith-ref">📚 جامع ترمذی - Jami at-Tirmidhi</div>
+    </div>
+
+    <!-- Hadith 3 -->
+    <div class="hadith-card">
+      <div class="hadith-topic">❤️ نیت (Intention)</div>
+      <div class="hadith-number">3</div>
+      <div class="hadith-arabic">
+        إنما الأعمال بالنيات وإنما لكل امرئ ما نوى
+      </div>
+      <div class="hadith-urdu">
+        بے شک اعمال نیتوں کے ساتھ ہیں اور ہر آدمی کو وہی ملے گا جس کی اس نے نیت کی تھی۔
+      </div>
+      <div class="hadith-english">
+        "Actions are judged by intentions, so each man will have what he intended."
+      </div>
+      <div class="hadith-ref">📚 صحیح بخاری - Sahih Bukhari</div>
+    </div>
+
+    <!-- Hadith 4 -->
+    <div class="hadith-card">
+      <div class="hadith-topic">📚 علم (Knowledge)</div>
+      <div class="hadith-number">4</div>
+      <div class="hadith-arabic">
+        من سلك طريقا يلتمس فيه علما سهل الله له طريقا إلى الجنة
+      </div>
+      <div class="hadith-urdu">
+        جو شخص علم حاصل کرنے کے لیے کسی راستے پر چلا، اللہ تعالیٰ اس کے لیے جنت کا راستہ آسان کر دیتا ہے۔
+      </div>
+      <div class="hadith-english">
+        "Whoever follows a path in pursuit of knowledge, Allah will make easy for him a path to Paradise."
+      </div>
+      <div class="hadith-ref">📚 صحیح مسلم - Sahih Muslim</div>
+    </div>
+
+    <!-- Hadith 5 -->
+    <div class="hadith-card">
+      <div class="hadith-topic">👨‍👩‍👧‍👦 والدین (Parents)</div>
+      <div class="hadith-number">5</div>
+      <div class="hadith-arabic">
+        رضا الله في رضا الوالدين وسخط الله في سخط الوالدين
+      </div>
+      <div class="hadith-urdu">
+        والدین کی رضا میں اللہ کی رضا ہے اور والدین کی ناراضی میں اللہ کی ناراضی ہے۔
+      </div>
+      <div class="hadith-english">
+        "The pleasure of Allah is in the pleasure of parents, and the displeasure of Allah is in the displeasure of parents."
+      </div>
+      <div class="hadith-ref">📚 جامع ترمذی - Jami at-Tirmidhi</div>
+    </div>
+
+    <!-- Hadith 6 -->
+    <div class="hadith-card">
+      <div class="hadith-topic">🗣️ سچ (Truth)</div>
+      <div class="hadith-number">6</div>
+      <div class="hadith-arabic">
+        عليكم بالصدق فإن الصدق يهدي إلى البر وإن البر يهدي إلى الجنة
+      </div>
+      <div class="hadith-urdu">
+        سچ پر قائم رہو، بے شک سچ بر کی طرف ہدایت کرتا ہے اور بر جنت کی طرف ہدایت کرتا ہے۔
+      </div>
+      <div class="hadith-english">
+        "Stick to truthfulness, for indeed truthfulness leads to righteousness, and righteousness leads to Paradise."
+      </div>
+      <div class="hadith-ref">📚 صحیح مسلم - Sahih Muslim</div>
+    </div>
+
+    <!-- Hadith 7 -->
+    <div class="hadith-card">
+      <div class="hadith-topic">🤝 اخلاق (Good Character)</div>
+      <div class="hadith-number">7</div>
+      <div class="hadith-arabic">
+        إن من أحبكم إلي وأقربكم مني مجلسا يوم القيامة أحاسنكم أخلاقا
+      </div>
+      <div class="hadith-urdu">
+        قیامت کے دن میرے سب سے زیادہ قریب اور مجلس میں میرے سب سے زیادہ محبوب وہ شخص ہوگا جس کا اخلاق سب سے اچھا ہوگا۔
+      </div>
+      <div class="hadith-english">
+        "Indeed, the most beloved of you to me and the closest to me on the Day of Judgment are those with the best character."
+      </div>
+      <div class="hadith-ref">📚 جامع ترمذی - Jami at-Tirmidhi</div>
+    </div>
+
+    <!-- Hadith 8 -->
+    <div class="hadith-card">
+      <div class="hadith-topic">🍚 کھانا (Food)</div>
+      <div class="hadith-number">8</div>
+      <div class="hadith-arabic">
+        ما llenيء ابن آدم وعاء شرا من بطنه
+      </div>
+      <div class="hadith-urdu">
+        ابن آدم نے اپنے پیٹ سے بھی بدتر برتن نہیں بھرا، ابن آدم کے لیے چند لقتے ہی کافی ہیں۔
+      </div>
+      <div class="hadith-english">
+        "The son of Adam does not fill any vessel worse than his stomach. It is sufficient for the son of Adam to eat a few mouthfuls to keep him alive."
+      </div>
+      <div class="hadith-ref">📚 جامع ترمذی - Jami at-Tirmidhi</div>
+    </div>
+
+    <!-- Hadith 9 -->
+    <div class="hadith-card">
+      <div class="hadith-topic">🌙 سحر (Morning)</div>
+      <div class="hadith-number">9</div>
+      <div class="hadith-arabic">
+        اللهم بارك لأمتي في بكورها
+      </div>
+      <div class="hadith-urdu">
+        اے اللہ! میری امت کے لیے صبح کے اوقات میں برکت عطا فرما۔
+      </div>
+      <div class="hadith-english">
+        "O Allah, bless my nation in their early mornings (times before noon)."
+      </div>
+      <div class="hadith-ref">📚 سنن ابن ماجہ - Sunan Ibn Majah</div>
+    </div>
+
+    <!-- Hadith 10 -->
+    <div class="hadith-card">
+      <div class="hadith-topic">☪️ اسلام (Islam)</div>
+      <div class="hadith-number">10</div>
+      <div class="hadith-arabic">
+        الإسلام أن تشهد أن لا إله إلا الله وأن محمدا رسول الله وتقيم الصلاة وتؤتي الزكاة وتصوم رمضان وتحج البيت إن استطعت إليه سبيلا
+      </div>
+      <div class="hadith-urdu">
+        یہ کہ تم گواہی دو کہ اللہ کے سوا کوئی معبود نہیں اور محمد ﷺ اللہ کے رسول ہیں، نماز قائم کرو، زکوٰۃ دو، رمضان کے روزے رکھو، اگر طاقت ہو تو بیت اللہ کا حج کرو۔
+      </div>
+      <div class="hadith-english">
+        "Islam is to testify that there is no god but Allah and Muhammad is the Messenger of Allah, establish prayer, give zakah, fast Ramadan, and perform Hajj if you are able."
+      </div>
+      <div class="hadith-ref">📚 صحیح مسلم - Sahih Muslim</div>
+    </div>
+
+    <!-- Hadith 11 -->
+    <div class="hadith-card">
+      <div class="hadith-topic">🙏 توبہ (Repentance)</div>
+      <div class="hadith-number">11</div>
+      <div class="hadith-arabic">
+        إن الله يبسط يده بالليل ليتوب مسيء النهار ويبسط يده بالنهار ليتوب مسيء الليل
+      </div>
+      <div class="hadith-urdu">
+        اللہ تعالیٰ رات کو اپنا ہاتھ پھیلاتا ہے تاکہ دن کے گناہگار توبہ کریں، اور دن کو اپنا ہاتھ پھیلاتا ہے تاکہ رات کے گناہگار توبہ کریں۔
+      </div>
+      <div class="hadith-english">
+        "Allah extends His hand by night to accept the repentance of those who sin by day, and He extends His hand by day to accept the repentance of those who sin by night."
+      </div>
+      <div class="hadith-ref">📚 صحیح مسلم - Sahih Muslim</div>
+    </div>
+
+    <!-- Hadith 12 -->
+    <div class="hadith-card">
+      <div class="hadith-topic">💪 طاقت (Strength)</div>
+      <div class="hadith-number">12</div>
+      <div class="hadith-arabic">
+        المؤمن القوي خير وأحب إلى الله من المؤمن الضعيف وفي كل خير
+      </div>
+      <div class="hadith-urdu">
+        مضبوط مومن کمزور مومن سے بہتر ہے اور اللہ کو زیادہ محبوب ہے، ہر خیر میں (مضبوط بہتر ہے)۔
+      </div>
+      <div class="hadith-english">
+        "The strong believer is better and more beloved to Allah than the weak believer, while there is good in both."
+      </div>
+      <div class="hadith-ref">📚 صحیح مسلم - Sahih Muslim</div>
+    </div>
+
+    <a href="quran.html" class="back-btn">⬅️ واپس قرآن شریف</a>
+  </div>
+
+  <div class="footer-note">🤲 "خيركم من تعلم القرآن وعلمه" - تم میں سے بہترین وہ ہے جو قرآن سیکھے اور سکھائے</div>
+</div>
+</body>
+</html>

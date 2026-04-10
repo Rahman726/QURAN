@@ -196,7 +196,7 @@ select { width: 260px; }
   color: var(--active-btn-text);
 }
 
-.dark-toggle, .lang-toggle, .speed-toggle, .urdu-audio-toggle, .continuous-toggle, .manzil-toggle, .surah-toggle {
+.dark-toggle, .lang-toggle, .speed-toggle, .urdu-audio-toggle, .continuous-toggle, .manzil-toggle, .surah-toggle, .namaz-nav, .hadith-nav, .naat-nav {
   background: var(--view-btn-bg);
   border-radius: 60px;
   padding: 5px 12px;
