@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>تلاوت القرآن - Quran with Urdu & English Translations</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="quran-app">
+  <div class="app-header">
+    <h1>📖 القُرْآنُ الكَرِيمُ <span>🎧</span></h1>
+    <p>Read • Listen • Search • Bookmark | اردو & English Translations</p>
+  </div>
+
+  <div class="controls-row">
+    <div class="surah-selector">
+      <select id="surahSelect"></select>
+    </div>
+    <div class="search-box">
+      <input type="text" id="searchInput" class="search-input" placeholder="🔍 Urdu / English / Arabic search" dir="auto">
+      <button id="searchBtn" class="search-btn">🔍</button>
+      <button id="clearSearchBtn" class="clear-search">✖</button>
+    </div>
+    <div class="view-options">
+      <button class="view-btn active" data-view="arabic">📖 Arabic + ترجمہ</button>
+      <button class="view-btn" data-view="transliteration">🔤 Transliteration</button>
+    </div>
+    <div class="lang-toggle">
+      <button id="urduBtn" class="lang-btn active">🇵🇰 اردو</button>
+      <button id="englishBtn" class="lang-btn">🇬🇧 English</button>
+    </div>
+    <div class="speed-toggle">
+      <button id="speedSlowBtn" class="speed-btn">🐢 Slow</button>
+      <button id="speedNormalBtn" class="speed-btn active">⚡ Normal</button>
+      <button id="speedFastBtn" class="speed-btn">🚀 Fast</button>
+    </div>
+    <div class="urdu-audio-toggle">
+      <button id="urduAudioBtn" class="action-btn">🔊 اردو ترجمہ</button>
+    </div>
+    <div class="continuous-toggle">
+      <button id="continuousBtn" class="action-btn">🔁 Continuous</button>
+    </div>
+    <div class="manzil-toggle">
+      <button id="manzilBtn" class="action-btn">🤲 منزل</button>
+    </div>
+    <div class="surah-toggle">
+      <button id="surahListBtn" class="action-btn">📖 سورتیں</button>
+    </div>
+    <div class="dark-toggle">
+      <button id="darkModeBtn" class="action-btn">🌙 Dark Mode</button>
+    </div>
+  </div>
+
+  <div class="bookmark-bar">
+    <div class="bookmark-info">
+      <span>📌 Bookmark:</span>
+      <button id="saveBookmarkBtn" class="btn-bookmark">💾 Save Current Position</button>
+    </div>
+    <div>
+      <button id="gotoBookmarkBtn" class="goto-bookmark">📍 Go to Bookmark</button>
+      <span id="bookmarkStatus" style="margin-right: 10px; font-size:0.8rem;"></span>
+    </div>
+  </div>
+
+  <div id="quranContent" class="quran-content">Loading...</div>
+  <div id="duaContainer"></div>
+  <div id="manzilContainer"></div>
+  
+  <!-- Surah List Modal -->
+  <div id="surahModal" class="surah-modal">
+    <div class="surah-modal-content">
+      <div class="surah-modal-header">
+        <h2>📖 تمام سورتیں (All Surahs)</h2>
+        <button id="closeSurahModal" class="btn-close-modal">✕</button>
+      </div>
+      <div id="surahListContainer" class="surah-list">
+        <!-- Surah list will be populated here -->
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer-note">🤲 "And We have certainly made the Quran easy for remembrance." — Urdu (Fateh Muhammad Jalandhari) & English (Muhammad Asad)</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
