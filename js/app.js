@@ -304,6 +304,11 @@
           '<span class="chip">' + escapeHtml(surah.revelationType === 'Meccan' ? 'Makki' : 'Madani') + '</span>' +
           (firstJuz ? '<span class="chip">Juz ' + firstJuz + '</span>' : '') +
         '</div>' +
+        '<button type="button" class="recite-launch" data-recite-open>' +
+          icons.mic +
+          '<span>Recite &amp; check</span>' +
+          '<small>AI checks your recitation</small>' +
+        '</button>' +
       '</section>' +
       (surah.bismillah ? '<p class="bismillah" dir="rtl" lang="ar">' + BISMILLAH + '</p>' : '') +
       '<div class="ayahs">' + surah.ayahs.map(function (item) { return renderAyah(surah, item); }).join('') + '</div>' +
@@ -807,6 +812,7 @@
 
   var recite = {
     ayah: null,
+    index: -1,
     tokens: [],
     recognition: null,
     listening: false,
@@ -877,7 +883,10 @@
   function openRecite(ayah) {
     if (!state.surah) return;
 
+    if (recite.listening) stopListening();
+
     recite.ayah = ayah;
+    recite.index = state.surah.ayahs.indexOf(ayah);
     recite.finalText = '';
     recite.interimText = '';
     recite.tokens = ayah.text.split(/\s+/).map(function (word) {
@@ -885,6 +894,9 @@
     }).filter(function (token) { return token.norm; });
 
     $('recite-title').textContent = state.surah.englishName + ' · Ayah ' + ayah.n;
+    $('recite-ayah').textContent = 'Ayah ' + ayah.n + ' of ' + state.surah.ayahs.length;
+    $('recite-prev').disabled = recite.index <= 0;
+    $('recite-next').disabled = recite.index >= state.surah.ayahs.length - 1;
     $('recite-ref').innerHTML = recite.tokens.map(function (token) {
       return '<span class="recite-word">' + escapeHtml(token.display) + '</span>';
     }).join(' ');
@@ -912,6 +924,14 @@
     stopListening();
     $('recite-modal').hidden = true;
     recite.ayah = null;
+    recite.index = -1;
+  }
+
+  function stepRecite(delta) {
+    if (!state.surah || recite.index < 0) return;
+    var next = recite.index + delta;
+    if (next < 0 || next >= state.surah.ayahs.length) return;
+    openRecite(state.surah.ayahs[next]);
   }
 
   function stopListening() {
@@ -1106,6 +1126,19 @@
     });
 
     $('content').addEventListener('click', function (event) {
+      if (event.target.closest('[data-recite-open]')) {
+        if (!state.surah || !state.surah.ayahs.length) return;
+        var nodes = all('.ayah');
+        var inView = nodes.find(function (node) {
+          return node.getBoundingClientRect().bottom > 90;
+        }) || nodes[0];
+        var startAyah = state.surah.ayahs.find(function (item) {
+          return inView && item.n === Number(inView.dataset.ayah);
+        }) || state.surah.ayahs[0];
+        openRecite(startAyah);
+        return;
+      }
+
       var button = event.target.closest('button[data-action]');
       if (!button || !state.surah) return;
       var ayah = state.surah.ayahs.find(function (item) {
@@ -1176,6 +1209,8 @@
       else startListening();
     });
     $('recite-close').addEventListener('click', closeRecite);
+    $('recite-prev').addEventListener('click', function () { stepRecite(-1); });
+    $('recite-next').addEventListener('click', function () { stepRecite(1); });
     $('recite-listen').addEventListener('click', function () {
       if (!recite.ayah) return;
       if (recite.listening) finishListening();

@@ -13,10 +13,12 @@ No frameworks, no build step, no package install.
   top bar and pick *without translation* (whole surah in Arabic) or *with translation*
   (each ayah followed by its English or Urdu translation audio); otherwise only the
   chosen ayah plays — playback speed (0.5×–2×) can be changed from the player bar
-- **Recite & check** — tap **Recite** on any ayah, allow the microphone and recite out loud.
-  The browser transcribes your voice and highlights missed or mispronounced words, with a
-  match score, the words to review, and a *Listen to this ayah* button to hear the correct
-  recitation. Chrome/Edge recommended; needs a microphone and internet for the speech service.
+- **Recite & check** — tap the green **Recite & check** button at the top of the surah (it
+  opens the ayah you are reading, and the modal can step through the surah), or **Recite**
+  under any single ayah. Allow the microphone and recite out loud: the browser transcribes
+  your voice and highlights missed or mispronounced words, with a match score, the words to
+  review, and a *Listen to this ayah* button to hear the correct recitation. Chrome/Edge
+  recommended; needs a microphone and internet for the speech service.
 - **Bookmarks** saved in `localStorage`
 - **Resume reading** from the last opened surah and ayah
 - **Three themes** — light, sepia, dark (follows your OS on first visit)
