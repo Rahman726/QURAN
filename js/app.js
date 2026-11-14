@@ -187,6 +187,7 @@
     updateReciterUI();
     updateContinueButton();
     bindEvents();
+    initAuth();
     updateBookmarkCount();
     renderBookmarks();
     bootstrap();
@@ -1275,6 +1276,239 @@
     $('recite-result').hidden = false;
   }
 
+  /* ---------- accounts ------------------------------------------------ */
+
+  var ACCOUNT_ICON =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' +
+      '<circle cx="12" cy="8.5" r="3.6"/><path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/>' +
+    '</svg>';
+
+  var auth = {
+    ready: false,
+    client: null,
+    user: null,
+    mode: 'signin',
+    busy: false
+  };
+
+  function authConfigured() {
+    var config = window.QURAN_FIREBASE_CONFIG || {};
+    return Boolean(config.apiKey && config.authDomain && config.projectId && config.appId &&
+      String(config.apiKey).indexOf('YOUR_') !== 0);
+  }
+
+  function setupNote(message) {
+    var note = $('auth-note');
+    note.textContent = message;
+    note.classList.add('is-setup');
+    $('auth-submit').disabled = true;
+    $('auth-google').disabled = true;
+  }
+
+  function initAuth() {
+    window.QURAN_FIREBASE_CONFIG = window.QURAN_FIREBASE_CONFIG || {};
+
+    if (typeof window.firebase === 'undefined' || !authConfigured()) {
+      setupNote('Sign-in is not set up yet. Add the Firebase web config in js/firebase-config.js to enable accounts.');
+      return;
+    }
+
+    try {
+      if (!window.firebase.apps.length) window.firebase.initializeApp(window.QURAN_FIREBASE_CONFIG);
+      auth.client = window.firebase.auth();
+      auth.ready = true;
+
+      auth.client.onAuthStateChanged(function (user) {
+        auth.user = user || null;
+        renderAccount();
+        if (user) closeAuth();
+      });
+      auth.client.getRedirectResult().catch(function () { /* popup/redirect cancelled */ });
+    } catch (error) {
+      setupNote('Firebase Authentication could not start. Check the config values in js/firebase-config.js.');
+    }
+  }
+
+  function renderAccount() {
+    var user = auth.user;
+    var avatar = $('account-avatar');
+
+    if (user) {
+      var name = user.displayName || (user.email || '').split('@')[0] || 'Account';
+      $('account-label').textContent = name;
+      avatar.textContent = name.charAt(0).toUpperCase();
+      $('account-btn').title = user.email || 'Account';
+      $('account-btn').setAttribute('aria-label', 'Account menu for ' + (user.email || name));
+      $('account-btn').classList.add('is-signed-in');
+    } else {
+      $('account-label').textContent = 'Sign in';
+      avatar.innerHTML = ACCOUNT_ICON;
+      $('account-btn').title = 'Sign in';
+      $('account-btn').setAttribute('aria-label', 'Sign in or create an account');
+      $('account-btn').classList.remove('is-signed-in');
+      closeAccountMenu();
+    }
+  }
+
+  function renderAccountMenu() {
+    if (!auth.user) {
+      $('account-menu').innerHTML = '';
+      return;
+    }
+    $('account-menu').innerHTML =
+      '<div class="account-head">' +
+        '<strong>' + escapeHtml(auth.user.displayName || 'Signed in') + '</strong>' +
+        '<small>' + escapeHtml(auth.user.email || '') + '</small>' +
+      '</div>' +
+      '<button type="button" class="continue-option account-signout" id="account-signout" role="menuitem">Sign out</button>';
+  }
+
+  function toggleAccountMenu() {
+    if (!auth.user) {
+      openAuth('signin');
+      return;
+    }
+    var menu = $('account-menu');
+    if (!menu.hidden) {
+      closeAccountMenu();
+      return;
+    }
+    renderAccountMenu();
+    menu.hidden = false;
+    $('account-btn').setAttribute('aria-expanded', 'true');
+  }
+
+  function closeAccountMenu() {
+    $('account-menu').hidden = true;
+    $('account-btn').setAttribute('aria-expanded', 'false');
+  }
+
+  function setAuthMode(mode) {
+    auth.mode = mode === 'signup' ? 'signup' : 'signin';
+    var signup = auth.mode === 'signup';
+
+    $('auth-title').textContent = signup ? 'Create account' : 'Sign in';
+    $('auth-submit').textContent = signup ? 'Create account' : 'Sign in';
+    $('auth-password').setAttribute('autocomplete', signup ? 'new-password' : 'current-password');
+    $('auth-tab-signin').classList.toggle('is-active', !signup);
+    $('auth-tab-signup').classList.toggle('is-active', signup);
+    $('auth-tab-signin').setAttribute('aria-selected', String(!signup));
+    $('auth-tab-signup').setAttribute('aria-selected', String(signup));
+    $('auth-error').hidden = true;
+
+    var note = $('auth-note');
+    if (!$('auth-submit').disabled) {
+      note.textContent = signup
+        ? 'Create a free account with your email, or continue with Google.'
+        : 'Sign in with your email, or continue with Google.';
+    }
+  }
+
+  function openAuth(mode) {
+    closeAccountMenu();
+    setAuthMode(mode || 'signin');
+    $('auth-modal').hidden = false;
+    if (!$('auth-email').disabled) $('auth-email').focus();
+  }
+
+  function closeAuth() {
+    if ($('auth-modal').hidden) return;
+    $('auth-modal').hidden = true;
+    $('auth-password').value = '';
+    showAuthError('');
+  }
+
+  function showAuthError(message) {
+    var node = $('auth-error');
+    node.textContent = message || '';
+    node.hidden = !message;
+  }
+
+  function setAuthBusy(busy) {
+    auth.busy = busy;
+    $('auth-submit').disabled = busy || !auth.ready;
+    $('auth-google').disabled = busy || !auth.ready;
+    $('auth-submit').textContent = busy
+      ? 'Please wait…'
+      : (auth.mode === 'signup' ? 'Create account' : 'Sign in');
+  }
+
+  function authErrorMessage(error) {
+    var code = (error && error.code) || '';
+    var messages = {
+      'auth/invalid-email': 'That email address does not look valid.',
+      'auth/missing-password': 'Enter your password.',
+      'auth/weak-password': 'Password must be at least 6 characters.',
+      'auth/email-already-in-use': 'An account with this email already exists. Try signing in.',
+      'auth/wrong-password': 'Email or password is incorrect.',
+      'auth/user-not-found': 'Email or password is incorrect.',
+      'auth/invalid-credential': 'Email or password is incorrect.',
+      'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
+      'auth/popup-closed-by-user': 'Google sign-in was closed before it finished.',
+      'auth/popup-blocked': 'Your browser blocked the Google popup. Allow popups and try again.',
+      'auth/operation-not-allowed': 'This sign-in method is not enabled in Firebase yet.',
+      'auth/unauthorized-domain': 'This domain is not allowed in Firebase Authentication settings.',
+      'auth/network-request-failed': 'Network error. Check your connection and try again.'
+    };
+    return messages[code] || (error && error.message) || 'Something went wrong. Please try again.';
+  }
+
+  async function submitAuth(event) {
+    event.preventDefault();
+    if (!auth.ready || auth.busy) return;
+
+    var email = $('auth-email').value.trim();
+    var password = $('auth-password').value;
+
+    showAuthError('');
+    if (!email) return showAuthError('Enter your email address.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showAuthError('Enter a valid email address.');
+    if (password.length < 6) return showAuthError('Password must be at least 6 characters.');
+
+    setAuthBusy(true);
+    try {
+      if (auth.mode === 'signup') {
+        await auth.client.createUserWithEmailAndPassword(email, password);
+        showToast('Account created — welcome to Quran Pak');
+      } else {
+        await auth.client.signInWithEmailAndPassword(email, password);
+        showToast('Signed in as ' + email);
+      }
+      $('auth-password').value = '';
+      closeAuth();
+    } catch (error) {
+      showAuthError(authErrorMessage(error));
+    } finally {
+      setAuthBusy(false);
+    }
+  }
+
+  async function googleSignIn() {
+    if (!auth.ready || auth.busy) return;
+    setAuthBusy(true);
+    try {
+      var provider = new window.firebase.auth.GoogleAuthProvider();
+      await auth.client.signInWithPopup(provider);
+      closeAuth();
+      showToast('Signed in with Google');
+    } catch (error) {
+      showAuthError(authErrorMessage(error));
+    } finally {
+      setAuthBusy(false);
+    }
+  }
+
+  async function signOutAccount() {
+    if (!auth.client) return;
+    closeAccountMenu();
+    try {
+      await auth.client.signOut();
+      showToast('Signed out');
+    } catch (error) {
+      showToast('Could not sign out. Please try again.');
+    }
+  }
+
   /* ---------- misc UI -------------------------------------------------- */
 
   var toastTimer = null;
@@ -1369,6 +1603,23 @@
     $('font-minus').addEventListener('click', function () { changeFontSize(-2); });
     $('font-plus').addEventListener('click', function () { changeFontSize(2); });
     $('theme-btn').addEventListener('click', cycleTheme);
+
+    $('account-btn').addEventListener('click', function (event) {
+      event.stopPropagation();
+      toggleAccountMenu();
+    });
+    $('account-menu').addEventListener('click', function (event) {
+      if (event.target.closest('#account-signout')) signOutAccount();
+    });
+    $('auth-close').addEventListener('click', closeAuth);
+    $('auth-form').addEventListener('submit', submitAuth);
+    $('auth-google').addEventListener('click', googleSignIn);
+    all('.auth-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () { setAuthMode(tab.dataset.authMode); });
+    });
+    $('auth-modal').addEventListener('click', function (event) {
+      if (event.target === event.currentTarget) closeAuth();
+    });
     $('continue-btn').addEventListener('click', function (event) {
       event.stopPropagation();
       closeReciterMenu();
@@ -1395,6 +1646,7 @@
     document.addEventListener('click', function (event) {
       if (!event.target.closest('.continue-wrap')) closeContinueMenu();
       if (!event.target.closest('.reciter-wrap')) closeReciterMenu();
+      if (!event.target.closest('.account-wrap')) closeAccountMenu();
     });
     $('recite-mic').addEventListener('click', function () {
       if (recite.listening) finishListening();
@@ -1445,10 +1697,15 @@
 
     window.addEventListener('keydown', function (event) {
       if (event.key === 'Escape') {
+        if (!$('auth-modal').hidden) {
+          closeAuth();
+          return;
+        }
         if (!$('recite-modal').hidden) {
           closeRecite();
           return;
         }
+        closeAccountMenu();
         closeContinueMenu();
         closeReciterMenu();
         setSidebar(false);

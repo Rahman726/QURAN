@@ -22,6 +22,8 @@ No frameworks, no build step, no package install.
 - **Recite full surah** — the header also has a mic button that opens the whole surah.
   Recite it in order; the browser keeps listening through pauses, then rates the recitation
   **out of 100** with every missed word highlighted and a per-ayah list of the ayahs to review.
+- **Accounts** — **Sign in / Create account** in the top bar (email + password, or Google)
+  using Firebase Authentication, with an account menu and sign out
 - **Bookmarks** saved in `localStorage`
 - **Resume reading** from the last opened surah and ayah
 - **Three themes** — light, sepia, dark (follows your OS on first visit)
@@ -63,6 +65,24 @@ vercel --prod   # production deployment
 
 Vercel serves the site over HTTPS, which the **Recite & check** microphone feature requires.
 
+## Enable accounts (Firebase)
+
+The sign-in button works as soon as a Firebase web config is filled in. The repo ships
+with `js/firebase-config.js` empty, so the dialog shows a setup note instead.
+
+1. Create a project at <https://console.firebase.google.com>.
+2. **Project settings → Your apps → Web app**, register the app and copy the
+   `firebaseConfig` values into `js/firebase-config.js`.
+3. **Authentication → Sign-in method**: enable **Email/Password** and, for the Google
+   button, **Google** (set a support email).
+4. **Authentication → Settings → Authorized domains**: add your Vercel domain
+   (`your-project.vercel.app`) and keep `localhost` for local testing.
+5. Commit and redeploy. Sign in, create an account, then use the avatar menu to sign out.
+
+These config values are public client identifiers, not secrets — Firebase secures the
+project through its own rules. Accounts are only used for sign-in; reading data,
+bookmarks and settings continue to live on the device.
+
 ## Project structure
 
 ```
@@ -73,7 +93,8 @@ Quran/
 ├── css/
 │   └── style.css           # Themes, layout, ayah typography, responsive rules
 ├── js/
-│   └── app.js              # Routing, search, rendering, bookmarks, audio, settings
+│   ├── app.js              # Routing, search, rendering, bookmarks, audio, settings, accounts
+│   └── firebase-config.js  # Firebase web config for sign-in (empty by default)
 ├── data/
 │   ├── surahs.json         # Index of all 114 surahs (names, counts, revelation type)
 │   └── surahs/

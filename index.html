@@ -126,6 +126,16 @@
               <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8Z"/>
             </svg>
           </button>
+
+          <div class="account-wrap">
+            <button class="continue-btn account-btn" id="account-btn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Sign in or create an account" title="Sign in">
+              <span class="account-avatar" id="account-avatar" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/></svg>
+              </span>
+              <span id="account-label">Sign in</span>
+            </button>
+            <div class="continue-menu account-menu" id="account-menu" role="menu" aria-label="Account" hidden></div>
+          </div>
         </div>
       </header>
 
@@ -162,6 +172,45 @@
           <path d="M6 6l12 12M18 6L6 18"/>
         </svg>
       </button>
+    </div>
+  </div>
+
+  <div class="recite-modal auth-modal" id="auth-modal" hidden>
+    <div class="recite-card auth-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+      <div class="recite-head">
+        <div class="topbar-title">
+          <span class="eyebrow">Quran Pak account</span>
+          <strong id="auth-title">Sign in</strong>
+        </div>
+        <button class="icon-btn" id="auth-close" type="button" aria-label="Close sign-in dialog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+
+      <div class="auth-tabs" role="tablist" aria-label="Account mode">
+        <button class="auth-tab is-active" id="auth-tab-signin" type="button" data-auth-mode="signin" role="tab" aria-selected="true">Sign in</button>
+        <button class="auth-tab" id="auth-tab-signup" type="button" data-auth-mode="signup" role="tab" aria-selected="false">Create account</button>
+      </div>
+
+      <form class="auth-form" id="auth-form" novalidate>
+        <label for="auth-email">Email
+          <input id="auth-email" type="email" name="email" autocomplete="email" placeholder="you@example.com" required>
+        </label>
+        <label for="auth-password">Password
+          <input id="auth-password" type="password" name="password" autocomplete="current-password" placeholder="At least 6 characters" minlength="6" required>
+        </label>
+        <p class="auth-error" id="auth-error" role="alert" hidden></p>
+        <button class="auth-submit" id="auth-submit" type="submit">Sign in</button>
+      </form>
+
+      <div class="auth-or"><span>or</span></div>
+
+      <button class="auth-google" id="auth-google" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285f4" d="M22.5 12.2c0-.7-.06-1.4-.18-2.05H12v3.88h5.9a5.05 5.05 0 0 1-2.19 3.31v2.75h3.54c2.07-1.9 3.25-4.71 3.25-7.89Z"/><path fill="#34a853" d="M12 23c2.95 0 5.43-.98 7.25-2.66l-3.54-2.75c-.98.66-2.24 1.05-3.71 1.05-2.85 0-5.27-1.93-6.13-4.52H2.21v2.84A11 11 0 0 0 12 23Z"/><path fill="#fbbc05" d="M5.87 14.12a6.6 6.6 0 0 1 0-4.22V7.06H2.21a11 11 0 0 0 0 9.9l3.66-2.84Z"/><path fill="#ea4335" d="M12 4.75c1.61 0 3.05.55 4.19 1.64l3.14-3.14A11 11 0 0 0 2.21 7.06l3.66 2.84C6.73 7.31 9.15 4.75 12 4.75Z"/></svg>
+        Continue with Google
+      </button>
+
+      <p class="auth-note" id="auth-note">Sign in to keep your account on every device. Your bookmarks stay on this device.</p>
     </div>
   </div>
 
@@ -211,6 +260,9 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/app.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script defer src="js/firebase-config.js"></script>
+  <script defer src="js/app.js"></script>
 </body>
 </html>
