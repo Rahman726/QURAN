@@ -787,11 +787,19 @@ a { color: inherit; }
 
 .surah-header > * { position: relative; z-index: 1; }
 
+.recite-launch-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
 .recite-launch {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 18px;
+  margin-top: 0;
   padding: 10px 17px;
   font-size: 12.5px;
   font-weight: 600;
@@ -806,6 +814,18 @@ a { color: inherit; }
 .recite-launch:hover {
   transform: translateY(-1px);
   box-shadow: 0 14px 26px -12px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+.recite-launch.secondary {
+  color: var(--accent);
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
+  box-shadow: none;
+}
+
+.recite-launch.secondary:hover {
+  background: var(--accent-soft);
+  box-shadow: none;
 }
 
 .recite-launch svg { width: 15px; height: 15px; }
@@ -1220,6 +1240,8 @@ a { color: inherit; }
   margin-top: -2px;
 }
 
+.recite-nav.is-surah button { display: none; }
+
 .recite-ayah {
   min-width: 96px;
   font-size: 12px;
@@ -1259,6 +1281,46 @@ a { color: inherit; }
   text-align: right;
   background: var(--surface-2);
   border-radius: 12px;
+}
+
+.recite-ref.is-surah {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 10px;
+  font-size: calc(var(--arabic-size) * .6);
+  line-height: 2;
+}
+
+.recite-surah-ayah {
+  margin: 0;
+  padding: 8px 4px 9px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.recite-surah-ayah:last-child { border-bottom: 0; }
+
+.recite-surah-num {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.7em;
+  height: 1.7em;
+  margin-inline-end: 4px;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gold);
+  vertical-align: middle;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+  border-radius: 50%;
+}
+
+.score-total {
+  margin-inline-start: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: .7;
 }
 
 .recite-word {
@@ -1511,7 +1573,10 @@ a { color: inherit; }
   .player-speed::after { right: 9px; }
 
   .recite-card { padding: 14px; max-height: 90vh; }
+  .recite-launch small { display: none; }
+  .recite-launch-row { gap: 8px; }
   .recite-ref { padding: 12px 12px; font-size: calc(var(--arabic-size) * .7); }
+  .recite-ref.is-surah { font-size: calc(var(--arabic-size) * .55); }
   .recite-buttons { width: 100%; }
   .recite-mic, .recite-listen { flex: 1; justify-content: center; }
   .topbar-title strong { font-size: 13.5px; }

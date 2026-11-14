@@ -304,11 +304,18 @@
           '<span class="chip">' + escapeHtml(surah.revelationType === 'Meccan' ? 'Makki' : 'Madani') + '</span>' +
           (firstJuz ? '<span class="chip">Juz ' + firstJuz + '</span>' : '') +
         '</div>' +
-        '<button type="button" class="recite-launch" data-recite-open>' +
-          icons.mic +
-          '<span>Recite &amp; check</span>' +
-          '<small>AI checks your recitation</small>' +
-        '</button>' +
+        '<div class="recite-launch-row">' +
+          '<button type="button" class="recite-launch" data-recite-open>' +
+            icons.mic +
+            '<span>Recite &amp; check</span>' +
+            '<small>AI checks your recitation</small>' +
+          '</button>' +
+          '<button type="button" class="recite-launch secondary" data-recite-surah>' +
+            icons.mic +
+            '<span>Recite full surah</span>' +
+            '<small>Rated out of 100</small>' +
+          '</button>' +
+        '</div>' +
       '</section>' +
       (surah.bismillah ? '<p class="bismillah" dir="rtl" lang="ar">' + BISMILLAH + '</p>' : '') +
       '<div class="ayahs">' + surah.ayahs.map(function (item) { return renderAyah(surah, item); }).join('') + '</div>' +
@@ -812,6 +819,9 @@
 
   var recite = {
     ayah: null,
+    mode: 'ayah',
+    groups: null,
+    restarts: 0,
     index: -1,
     tokens: [],
     recognition: null,
@@ -880,27 +890,16 @@
     return ops.reverse();
   }
 
-  function openRecite(ayah) {
-    if (!state.surah) return;
-
-    if (recite.listening) stopListening();
-
-    recite.ayah = ayah;
-    recite.index = state.surah.ayahs.indexOf(ayah);
-    recite.finalText = '';
-    recite.interimText = '';
-    recite.tokens = ayah.text.split(/\s+/).map(function (word) {
+  function tokenizeAyah(ayah) {
+    return ayah.text.split(/\s+/).map(function (word) {
       return { display: word, norm: normalizeArabicWord(word) };
     }).filter(function (token) { return token.norm; });
+  }
 
-    $('recite-title').textContent = state.surah.englishName + ' · Ayah ' + ayah.n;
-    $('recite-ayah').textContent = 'Ayah ' + ayah.n + ' of ' + state.surah.ayahs.length;
-    $('recite-prev').disabled = recite.index <= 0;
-    $('recite-next').disabled = recite.index >= state.surah.ayahs.length - 1;
-    $('recite-ref').innerHTML = recite.tokens.map(function (token) {
-      return '<span class="recite-word">' + escapeHtml(token.display) + '</span>';
-    }).join(' ');
-    $('recite-heard').textContent = 'Tap the mic and recite this ayah out loud — the words you get wrong will be highlighted.';
+  function startReciteSession() {
+    recite.finalText = '';
+    recite.interimText = '';
+    recite.restarts = 0;
     $('recite-result').hidden = true;
     $('recite-score').innerHTML = '';
     $('recite-notes').innerHTML = '';
@@ -910,13 +909,74 @@
     var supported = Boolean(SpeechRecognition);
     $('recite-mic').disabled = !supported;
     $('recite-mic').classList.remove('is-listening');
-    $('recite-mic-label').textContent = 'Start reciting';
+    $('recite-mic-label').textContent = recite.mode === 'surah' ? 'Start reciting the surah' : 'Start reciting';
     $('recite-hint').textContent = supported
-      ? 'Your browser transcribes your voice. Works best in Chrome or Edge on localhost or https.'
+      ? (recite.mode === 'surah'
+        ? 'Recite the surah in order. Tap the button again when you finish to get a score out of 100.'
+        : 'Your browser transcribes your voice. Works best in Chrome or Edge on localhost or https.')
       : 'Speech recognition is not available in this browser. Try Chrome or Edge.';
 
     $('recite-modal').hidden = false;
     $('recite-mic').focus();
+  }
+
+  function openRecite(ayah) {
+    if (!state.surah) return;
+    if (recite.listening) stopListening();
+
+    recite.mode = 'ayah';
+    recite.groups = null;
+    recite.ayah = ayah;
+    recite.index = state.surah.ayahs.indexOf(ayah);
+    recite.tokens = tokenizeAyah(ayah);
+
+    $('recite-title').textContent = state.surah.englishName + ' · Ayah ' + ayah.n;
+    $('recite-ayah').textContent = 'Ayah ' + ayah.n + ' of ' + state.surah.ayahs.length;
+    $('recite-prev').disabled = recite.index <= 0;
+    $('recite-next').disabled = recite.index >= state.surah.ayahs.length - 1;
+    $('recite-nav').classList.remove('is-surah');
+    $('recite-listen').hidden = false;
+    $('recite-ref').classList.remove('is-surah');
+    $('recite-ref').innerHTML = recite.tokens.map(function (token) {
+      return '<span class="recite-word">' + escapeHtml(token.display) + '</span>';
+    }).join(' ');
+    $('recite-heard').textContent = 'Tap the mic and recite this ayah out loud — the words you get wrong will be highlighted.';
+
+    startReciteSession();
+  }
+
+  function openSurahRecite() {
+    if (!state.surah) return;
+    if (recite.listening) stopListening();
+
+    recite.mode = 'surah';
+    recite.ayah = null;
+    recite.index = 0;
+    recite.tokens = null;
+    recite.groups = state.surah.ayahs.map(function (item) {
+      var tokens = tokenizeAyah(item);
+      return {
+        ayah: item,
+        tokens: tokens,
+        norm: tokens.map(function (token) { return token.norm; })
+      };
+    }).filter(function (group) { return group.norm.length; });
+
+    $('recite-title').textContent = state.surah.englishName + ' · Full surah';
+    $('recite-ayah').textContent = recite.groups.length + ' ayahs';
+    $('recite-nav').classList.add('is-surah');
+    $('recite-listen').hidden = true;
+    $('recite-ref').classList.add('is-surah');
+    $('recite-ref').innerHTML = recite.groups.map(function (group) {
+      return '<p class="recite-surah-ayah" data-ayah="' + group.ayah.n + '">' +
+        '<span class="recite-surah-num">' + group.ayah.n + '</span> ' +
+        group.tokens.map(function (token) {
+          return '<span class="recite-word">' + escapeHtml(token.display) + '</span>';
+        }).join(' ') + '</p>';
+    }).join('');
+    $('recite-heard').textContent = 'Tap the mic and recite the whole surah — you will get a score out of 100 at the end.';
+
+    startReciteSession();
   }
 
   function closeRecite() {
@@ -925,6 +985,7 @@
     $('recite-modal').hidden = true;
     recite.ayah = null;
     recite.index = -1;
+    recite.groups = null;
   }
 
   function stepRecite(delta) {
@@ -945,13 +1006,17 @@
   }
 
   function startListening() {
-    if (!SpeechRecognition || !recite.ayah) return;
+    if (!SpeechRecognition) return;
+    if (recite.mode === 'surah' ? !recite.groups || !recite.groups.length : !recite.ayah) return;
 
     if (!audio.paused) audio.pause();
     recite.finalText = '';
     recite.interimText = '';
+    recite.restarts = 0;
     $('recite-result').hidden = true;
-    $('recite-heard').textContent = 'Listening… recite the ayah out loud.';
+    $('recite-heard').textContent = recite.mode === 'surah'
+      ? 'Listening… recite the surah in order.'
+      : 'Listening… recite the ayah out loud.';
     $('recite-hint').textContent = 'Speak clearly; tap the button again when you are done.';
     all('#recite-ref .recite-word').forEach(function (word) {
       word.className = 'recite-word';
@@ -990,7 +1055,26 @@
     };
 
     recognition.onend = function () {
-      if (!recite.listening) return;
+      if (!recite.listening || recite.recognition !== recognition) return;
+
+      // For a whole surah the browser may end the session after a short pause.
+      // Keep listening until the user taps stop, but give up after many restarts.
+      if (recite.mode === 'surah' && recite.restarts < 40) {
+        recite.restarts++;
+        setTimeout(function () {
+          if (!recite.listening || recite.recognition !== recognition) return;
+          try {
+            recognition.start();
+          } catch (error) {
+            recite.listening = false;
+            $('recite-mic').classList.remove('is-listening');
+            $('recite-mic-label').textContent = 'Check again';
+            evaluateRecitation();
+          }
+        }, 300);
+        return;
+      }
+
       recite.listening = false;
       $('recite-mic').classList.remove('is-listening');
       $('recite-mic-label').textContent = 'Check again';
@@ -1022,6 +1106,11 @@
   }
 
   function evaluateRecitation() {
+    if (recite.mode === 'surah') {
+      evaluateSurahRecitation();
+      return;
+    }
+
     var heardText = (recite.finalText + ' ' + recite.interimText).trim();
     var heardTokens = heardText.split(/\s+/).map(normalizeArabicWord).filter(Boolean);
 
@@ -1089,6 +1178,103 @@
     $('recite-result').hidden = false;
   }
 
+  // Matches the whole recitation ayah by ayah in reading order. Words are looked up
+  // in a small window ahead, so a full surah needs no huge alignment table and a
+  // skipped ayah never swallows the words of the next one.
+  function evaluateSurahRecitation() {
+    var heardText = (recite.finalText + ' ' + recite.interimText).trim();
+    var heardTokens = heardText.split(/\s+/).map(normalizeArabicWord).filter(Boolean);
+
+    if (!heardTokens.length) {
+      $('recite-heard').textContent = 'Nothing was recognised. Tap the mic and try again a little louder.';
+      $('recite-result').hidden = true;
+      return;
+    }
+
+    var position = 0;
+    var totalWords = 0;
+    var matchedWords = 0;
+    var extrasTotal = 0;
+    var problems = [];
+
+    recite.groups.forEach(function (group) {
+      var reference = group.norm;
+      var status = reference.map(function () { return 'ok'; });
+      var extras = 0;
+
+      reference.forEach(function (word, index) {
+        var found = -1;
+        var limit = Math.min(heardTokens.length, position + 4);
+        for (var j = position; j < limit; j++) {
+          if (heardTokens[j] === word) {
+            found = j;
+            break;
+          }
+        }
+        if (found === -1) {
+          status[index] = 'missed';
+          return;
+        }
+        extras += found - position;
+        position = found + 1;
+      });
+
+      var matched = status.filter(function (value) { return value === 'ok'; }).length;
+      totalWords += reference.length;
+      matchedWords += matched;
+      extrasTotal += extras;
+      group.status = status;
+
+      var missed = status.filter(function (value) { return value === 'missed'; }).length;
+      if (missed) {
+        problems.push({ n: group.ayah.n, missed: missed, wrong: 0, total: reference.length });
+      }
+    });
+
+    $('recite-ref').innerHTML = recite.groups.map(function (group) {
+      return '<p class="recite-surah-ayah" data-ayah="' + group.ayah.n + '">' +
+        '<span class="recite-surah-num">' + group.ayah.n + '</span> ' +
+        group.tokens.map(function (token, index) {
+          return '<span class="recite-word ' + (group.status ? group.status[index] : '') + '">' +
+            escapeHtml(token.display) + '</span>';
+        }).join(' ') + '</p>';
+    }).join('');
+
+    var percent = totalWords ? Math.round((matchedWords / totalWords) * 100) : 0;
+    var verdict = percent >= 90
+      ? 'Excellent recitation of the whole surah.'
+      : percent >= 70
+        ? 'Good — review the highlighted words.'
+        : 'Keep practising — the highlighted words need work.';
+
+    $('recite-heard').textContent = 'Heard: ' + heardText;
+    $('recite-score').innerHTML =
+      '<span class="recite-score-pct' + (percent < 70 ? ' is-low' : '') + '">' + percent +
+      '<span class="score-total">/100</span></span>' +
+      '<span class="recite-score-text">' + matchedWords + ' of ' + totalWords + ' words matched across ' +
+      recite.groups.length + ' ayahs. ' + escapeHtml(verdict) + '</span>';
+
+    var notes = [];
+    problems.slice(0, 12).forEach(function (item) {
+      var parts = [];
+      if (item.missed) parts.push(item.missed + ' missed');
+      if (item.wrong) parts.push(item.wrong + ' to check');
+      notes.push('<li><span class="note-label">Ayah ' + item.n + ':</span> ' +
+        parts.join(', ') + ' of ' + item.total + ' words</li>');
+    });
+    if (problems.length > 12) {
+      notes.push('<li>+' + (problems.length - 12) + ' more ayahs need practice.</li>');
+    }
+    if (extrasTotal) {
+      notes.push('<li><span class="note-label">Extra words heard:</span> ' + extrasTotal +
+        ' — recite slowly and clearly without adding words.</li>');
+    }
+    if (!notes.length) notes.push('<li>No mistakes detected — every word matched.</li>');
+
+    $('recite-notes').innerHTML = notes.join('');
+    $('recite-result').hidden = false;
+  }
+
   /* ---------- misc UI -------------------------------------------------- */
 
   var toastTimer = null;
@@ -1126,6 +1312,12 @@
     });
 
     $('content').addEventListener('click', function (event) {
+      if (event.target.closest('[data-recite-surah]')) {
+        if (!state.surah) return;
+        openSurahRecite();
+        return;
+      }
+
       if (event.target.closest('[data-recite-open]')) {
         if (!state.surah || !state.surah.ayahs.length) return;
         var nodes = all('.ayah');

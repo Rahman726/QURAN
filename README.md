@@ -19,6 +19,9 @@ No frameworks, no build step, no package install.
   your voice and highlights missed or mispronounced words, with a match score, the words to
   review, and a *Listen to this ayah* button to hear the correct recitation. Chrome/Edge
   recommended; needs a microphone and internet for the speech service.
+- **Recite full surah** — the header also has a mic button that opens the whole surah.
+  Recite it in order; the browser keeps listening through pauses, then rates the recitation
+  **out of 100** with every missed word highlighted and a per-ayah list of the ayahs to review.
 - **Bookmarks** saved in `localStorage`
 - **Resume reading** from the last opened surah and ayah
 - **Three themes** — light, sepia, dark (follows your OS on first visit)
