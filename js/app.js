@@ -80,6 +80,7 @@
       .replace(/[إأآٱ]/g, 'ا')
       .replace(/ى/g, 'ي')
       .replace(/ة/g, 'ه')
+      .replace(/[^a-z0-9\u0600-\u06FF]/g, '')
       .trim();
   }
 
@@ -393,14 +394,23 @@
     $('topbar-name').textContent = surah.englishName + ' · ' + surah.englishNameTranslation;
   }
 
+  // Vowel-free skeleton so transliteration variants match (Yaseen / yasin,
+  // Al-Ikhlaas / ikhlas).
+  function searchKey(value) {
+    return normalizeSearch(value)
+      .replace(/[aeiou]/g, '')
+      .replace(/(.)\1+/g, '$1');
+  }
+
   function renderSurahList() {
     var query = normalizeSearch(state.search);
+    var key = searchKey(state.search);
     var matches = state.surahs.filter(function (surah) {
       if (!query) return true;
-      return normalizeSearch(surah.englishName).indexOf(query) !== -1 ||
-        normalizeSearch(surah.englishNameTranslation).indexOf(query) !== -1 ||
-        normalizeSearch(surah.name).indexOf(query) !== -1 ||
-        String(surah.number) === query;
+      var fields = [surah.englishName, surah.englishNameTranslation, surah.name];
+      if (fields.some(function (text) { return normalizeSearch(text).indexOf(query) !== -1; })) return true;
+      if (key && fields.some(function (text) { return searchKey(text).indexOf(key) !== -1; })) return true;
+      return String(surah.number) === query;
     });
 
     if (!matches.length) {
