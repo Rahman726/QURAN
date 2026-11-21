@@ -51,8 +51,14 @@ Then open <http://localhost:8000>.
 ## Install it as an app (PWA)
 
 The reader is a Progressive Web App: `manifest.webmanifest` supplies the name and icons and
-`sw.js` caches the app shell plus Quran data, so installed copies keep working without a
-connection (audio still needs internet).
+`sw.js` caches the app shell, **all 114 surahs with both translations**, the web fonts and
+the recitation audio you have listened to. After the first visit the whole Quran can be read
+with no connection at all.
+
+- Recitation audio is saved as it is played, and the next two ayahs are downloaded in the
+  background so playback does not stall; up to 600 ayah files are kept on the device.
+- Audio that was never played still needs one online listen before it works offline.
+- Bump `CACHE`/`SHELL_CACHE` in `sw.js` when files change so installed copies refresh.
 
 - **Chrome / Edge (Windows, Mac, Linux)** — click the install icon in the address bar, or
   **Download app** in the sidebar
@@ -60,8 +66,7 @@ connection (audio still needs internet).
 - **iPhone / iPad (Safari)** — Share → Add to Home Screen
 - **Mac (Safari)** — File → Add to Dock
 
-Installing requires HTTPS (Vercel provides it) or `localhost`. To publish an update, bump
-`CACHE` in `sw.js` so installed copies pick up the new files.
+Installing requires HTTPS (Vercel provides it) or `localhost`.
 
 ## Deploy on Vercel
 

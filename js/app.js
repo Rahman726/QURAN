@@ -230,7 +230,8 @@
 
     if ('serviceWorker' in navigator && secure) {
       var register = function () {
-        navigator.serviceWorker.register('sw.js').catch(function () { /* offline cache is optional */ });
+        navigator.serviceWorker.register('sw.js').then(updateOfflineStatus)
+          .catch(function () { /* offline cache is optional */ });
       };
       if (document.readyState === 'complete') register();
       else window.addEventListener('load', register);
@@ -249,6 +250,41 @@
     });
 
     updateInstallButton();
+    updateOfflineStatus();
+  }
+
+  var FONT_CSS = 'https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap';
+  var fontsPrecached = false;
+
+  function precacheFontsFromPage() {
+    if (fontsPrecached || !navigator.onLine) return;
+    if (!navigator.serviceWorker.controller) return;
+    fontsPrecached = true;
+    fetch(FONT_CSS).then(function (response) { return response.text(); }).then(function (css) {
+      var urls = css.match(/https:\/\/fonts\.gstatic\.com\/[^)"']+\.woff2/g) || [];
+      urls.forEach(function (url) { fetch(url, { mode: 'cors' }).catch(function () {}); });
+    }).catch(function () { fontsPrecached = false; });
+  }
+
+  function updateOfflineStatus() {
+    if (!('serviceWorker' in navigator) || !('caches' in window)) return;
+    navigator.serviceWorker.ready.then(function () {
+      return caches.keys().then(function (names) {
+        var shell = names.filter(function (name) { return name.indexOf('quranpak-shell-') === 0; })[0];
+        if (!shell) return null;
+        return caches.open(shell).then(function (cache) { return cache.keys(); });
+      });
+    }).then(function (keys) {
+      var status = $('offline-status');
+      if (!status || !keys) return;
+      var saved = keys.filter(function (request) {
+        return /\/data\/surahs\/\d{3}\.json$/.test(request.url);
+      }).length;
+      status.textContent = saved >= 114
+        ? 'Offline ready: all 114 surahs, both translations, fonts and your listened audio are saved on this device.'
+        : 'Saving for offline reading — ' + saved + ' of 114 surahs done. Keep the app open for a moment.';
+      if (saved >= 114) precacheFontsFromPage();
+    }).catch(function () {});
   }
 
   /* ---------- initialisation ------------------------------------------- */
@@ -670,6 +706,29 @@
     }
   }
 
+  var prefetched = {};
+
+  function prefetchAudio(url) {
+    if (prefetched[url] || !navigator.onLine) return;
+    prefetched[url] = true;
+    // Fetched through the service worker, so it is stored for offline playback.
+    fetch(url, { mode: 'no-cors', credentials: 'omit' }).catch(function () {
+      delete prefetched[url];
+    });
+  }
+
+  function prefetchNextAyahs(ayah) {
+    if (!state.surah || !state.surah.ayahs) return;
+    var index = state.surah.ayahs.findIndex(function (item) { return item.n === ayah.n; });
+    if (index < 0) return;
+    state.surah.ayahs.slice(index + 1, index + 3).forEach(function (next) {
+      prefetchAudio(currentReciter().base + '/' + next.g + '.mp3');
+      if (state.continueListen && state.continueTranslation) {
+        prefetchAudio(translationTrack().base + '/' + next.g + '.mp3');
+      }
+    });
+  }
+
   function playAyah(ayah) {
     if (!state.surah) return;
 
@@ -684,6 +743,7 @@
     highlightCurrentAyah();
     syncPlayer();
     saveLastRead(state.surah.number, ayah.n);
+    prefetchNextAyahs(ayah);
   }
 
   function toggleAyah(ayah) {
@@ -786,6 +846,7 @@
     $('player-title').textContent = state.surah.englishName + ' · Ayah ' + ayah.n;
     $('player-sub').textContent = 'Translation · ' + track.name;
     syncPlayer();
+    prefetchNextAyahs(ayah);
   }
 
   function closeContinueMenu() {
@@ -1786,7 +1847,10 @@
     audio.addEventListener('pause', syncPlayer);
     audio.addEventListener('timeupdate', updateProgress);
     audio.addEventListener('error', function () {
-      if (audio.getAttribute('src')) {
+      if (!audio.getAttribute('src')) return;
+      if (!navigator.onLine) {
+        showToast('You are offline and this ayah\'s audio is not saved yet. Play it once with internet to keep it offline.');
+      } else {
         showToast('Recitation could not load. Check your internet connection.');
       }
     });
