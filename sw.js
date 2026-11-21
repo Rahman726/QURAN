@@ -10,7 +10,7 @@ var FONT_CSS = 'https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inte
 var SHELL = [
   './',
   './index.html',
-  './css/style.css?v=3',
+  './css/style.css?v=4',
   './js/app.js',
   './js/firebase-config.js',
   './manifest.webmanifest',
