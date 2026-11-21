@@ -7,10 +7,16 @@
   <meta name="description" content="Read the Holy Quran with Uthmani Arabic text, English and Urdu translations, verse-by-verse recitation, bookmarks and themes.">
   <meta name="theme-color" content="#0c6b52">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Quran Pak">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=2">
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
   <div class="app">
@@ -48,6 +54,10 @@
       </div>
 
       <div class="sidebar-foot">
+        <button class="install-btn" id="install-btn" type="button" title="Download Quran Pak on this device">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4.5 17.5v1.5a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5v-1.5"/></svg>
+          <span>Download app</span>
+        </button>
         <span>Uthmani script · Sahih International · Urdu</span>
         <span class="foot-dot">Recitation by Mishary Alafasy</span>
       </div>
@@ -254,6 +264,30 @@
           <button class="recite-listen" id="recite-listen" type="button">Listen to this ayah</button>
         </div>
         <p class="recite-hint" id="recite-hint">Your voice is processed by the browser's speech service.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="recite-modal" id="install-modal" hidden>
+    <div class="recite-card install-card" role="dialog" aria-modal="true" aria-labelledby="install-title">
+      <div class="recite-head">
+        <div class="topbar-title">
+          <span class="eyebrow">Keep it on your device</span>
+          <strong id="install-title">Download Quran Pak</strong>
+        </div>
+        <button class="icon-btn" id="install-close" type="button" aria-label="Close download instructions">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="recite-body">
+        <p class="install-lead">Install it once and it opens from your desktop or home screen like any other app — no link to remember. Reading works offline too.</p>
+        <ul class="install-steps">
+          <li><strong>Chrome or Edge — Windows, Mac, Linux</strong><span>Click the install icon in the address bar, or open the browser menu and choose “Install Quran Pak”.</span></li>
+          <li><strong>Android — Chrome</strong><span>Menu ⋮ → “Add to Home screen” → Install.</span></li>
+          <li><strong>iPhone or iPad — Safari</strong><span>Share → “Add to Home Screen”.</span></li>
+          <li><strong>Mac — Safari</strong><span>File → “Add to Dock”.</span></li>
+        </ul>
+        <p class="install-note" id="install-note">Your place, bookmarks and settings stay saved on this device.</p>
       </div>
     </div>
   </div>

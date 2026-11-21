@@ -1,0 +1,21 @@
+{
+  "name": "Quran Pak — The Noble Quran Reader",
+  "short_name": "Quran Pak",
+  "description": "Read the Holy Quran with Uthmani Arabic, English and Urdu translations, verse-by-verse recitation, recitation checking and bookmarks.",
+  "id": "/",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#f7f4ec",
+  "theme_color": "#0c6b52",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["books", "education", "lifestyle"],
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

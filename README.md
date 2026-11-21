@@ -24,6 +24,10 @@ No frameworks, no build step, no package install.
   **out of 100** with every missed word highlighted and a per-ayah list of the ayahs to review.
 - **Accounts** — **Sign in / Create account** in the top bar (email + password, or Google)
   using Firebase Authentication, with an account menu and sign out
+- **Download / install as an app** — **Download app** in the sidebar (and in the account
+  menu) installs the reader on Windows, Mac, Linux, Android or iOS. Once installed it opens
+  from its own icon and works offline; step-by-step instructions are shown when the browser
+  does not offer a native install prompt
 - **Bookmarks** saved in `localStorage`
 - **Resume reading** from the last opened surah and ayah
 - **Three themes** — light, sepia, dark (follows your OS on first visit)
@@ -43,6 +47,21 @@ npx serve .
 ```
 
 Then open <http://localhost:8000>.
+
+## Install it as an app (PWA)
+
+The reader is a Progressive Web App: `manifest.webmanifest` supplies the name and icons and
+`sw.js` caches the app shell plus Quran data, so installed copies keep working without a
+connection (audio still needs internet).
+
+- **Chrome / Edge (Windows, Mac, Linux)** — click the install icon in the address bar, or
+  **Download app** in the sidebar
+- **Android (Chrome)** — menu ⋮ → Add to Home screen
+- **iPhone / iPad (Safari)** — Share → Add to Home Screen
+- **Mac (Safari)** — File → Add to Dock
+
+Installing requires HTTPS (Vercel provides it) or `localhost`. To publish an update, bump
+`CACHE` in `sw.js` so installed copies pick up the new files.
 
 ## Deploy on Vercel
 

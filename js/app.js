@@ -175,6 +175,82 @@
     return 'data/surahs/' + String(number).padStart(3, '0') + '.json';
   }
 
+  /* ---------- download / install as an app ----------------------------- */
+
+  var installPrompt = null;
+
+  function isInstalled() {
+    return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+      window.navigator.standalone === true;
+  }
+
+  function updateInstallButton() {
+    var button = $('install-btn');
+    if (!button) return;
+    button.hidden = isInstalled();
+  }
+
+  function openInstallHelp() {
+    $('install-modal').hidden = false;
+    $('install-close').focus();
+  }
+
+  function closeInstallHelp() {
+    $('install-modal').hidden = true;
+  }
+
+  function startInstall() {
+    closeAccountMenu();
+    if (isInstalled()) {
+      showToast('Quran Pak is already installed on this device.');
+      return;
+    }
+    if (!installPrompt) {
+      openInstallHelp();
+      return;
+    }
+    var prompt = installPrompt;
+    installPrompt = null;
+    prompt.prompt();
+    if (prompt.userChoice && prompt.userChoice.then) {
+      prompt.userChoice.then(function (choice) {
+        if (choice && choice.outcome === 'accepted') {
+          showToast('Installing Quran Pak…');
+        }
+        updateInstallButton();
+      }).catch(function () {});
+    }
+    updateInstallButton();
+  }
+
+  function initInstall() {
+    var secure = window.location.protocol === 'https:' ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+
+    if ('serviceWorker' in navigator && secure) {
+      var register = function () {
+        navigator.serviceWorker.register('sw.js').catch(function () { /* offline cache is optional */ });
+      };
+      if (document.readyState === 'complete') register();
+      else window.addEventListener('load', register);
+    }
+
+    window.addEventListener('beforeinstallprompt', function (event) {
+      event.preventDefault();
+      installPrompt = event;
+      updateInstallButton();
+    });
+
+    window.addEventListener('appinstalled', function () {
+      installPrompt = null;
+      updateInstallButton();
+      showToast('Quran Pak installed. Open it any time from your apps.');
+    });
+
+    updateInstallButton();
+  }
+
   /* ---------- initialisation ------------------------------------------- */
 
   function init() {
@@ -189,6 +265,7 @@
     updateContinueButton();
     bindEvents();
     initAuth();
+    initInstall();
     updateBookmarkCount();
     renderBookmarks();
     bootstrap();
@@ -1361,8 +1438,12 @@
   }
 
   function renderAccountMenu() {
+    var installOption =
+      '<button type="button" class="continue-option account-install" id="account-install" role="menuitem">' +
+        '<span class="opt-text"><strong>Download app</strong><small>Install on this device</small></span>' +
+      '</button>';
     if (!auth.user) {
-      $('account-menu').innerHTML = '';
+      $('account-menu').innerHTML = installOption;
       return;
     }
     $('account-menu').innerHTML =
@@ -1370,6 +1451,7 @@
         '<strong>' + escapeHtml(auth.user.displayName || 'Signed in') + '</strong>' +
         '<small>' + escapeHtml(auth.user.email || '') + '</small>' +
       '</div>' +
+      installOption +
       '<button type="button" class="continue-option account-signout" id="account-signout" role="menuitem">Sign out</button>';
   }
 
@@ -1620,6 +1702,12 @@
     });
     $('account-menu').addEventListener('click', function (event) {
       if (event.target.closest('#account-signout')) signOutAccount();
+      else if (event.target.closest('#account-install')) startInstall();
+    });
+    $('install-btn').addEventListener('click', startInstall);
+    $('install-close').addEventListener('click', closeInstallHelp);
+    $('install-modal').addEventListener('click', function (event) {
+      if (event.target === event.currentTarget) closeInstallHelp();
     });
     $('auth-close').addEventListener('click', closeAuth);
     $('auth-form').addEventListener('submit', submitAuth);
@@ -1713,6 +1801,10 @@
         }
         if (!$('recite-modal').hidden) {
           closeRecite();
+          return;
+        }
+        if (!$('install-modal').hidden) {
+          closeInstallHelp();
           return;
         }
         closeAccountMenu();
